@@ -13,8 +13,9 @@ class model {
     /**
      * Bierze w±tki z bazy
      */
-    public function wez_watki(){
-       $this->baza->polecenie='Select * from pk_topics;';
+    public function wez_dane($nazwa){
+        echo $this->baza->polecenie;
+       $this->baza->polecenie='Select * from pk_'.$nazwa.';';
        $this->watki=$this->baza->wypisz_polecenie();
     }
     
