@@ -32,6 +32,23 @@ class baza{
         $wynik_koncowy=$wynik_posredni->fetchAll();
         return $wynik_koncowy;
     }
+    
+    public function aktualizuj($gdzie,$co,$na_co,$warunek){
+        $sql = "UPDATE pk_".$gdzie
+                . " SET ".$co."='".$na_co."'  WHERE ".$warunek.";";
+	$q = $this->polaczenie->prepare($sql);
+	$q->execute();
+    }
+    
+    public function dodaj_wartosci($gdzie,$kolumny,$wartosci){
+        
+        $sql = "insert into pk_".$gdzie
+        . "(".$kolumny.") values (".$wartosci.");";
+        
+    echo $sql;
+   $q = $this->polaczenie->prepare($sql);
+   $q->execute();
+    }
         
        
     
