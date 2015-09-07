@@ -1,21 +1,21 @@
 <?php
 class model {
     public $baza;
+    public $watki;
+    public $posty;
     /**
      * obiekt do obs³ugi bazy danych i dzialania na danych
      */
     public function __construct() {
-        echo 'utworzono model<br/>';
                 require 'baza.php';
                 $this->baza= new baza;
     }
     /**
-     * Wypisuje w±tki
+     * Bierze w±tki z bazy
      */
-    public function wypisz_watki(){
+    public function wez_watki(){
        $this->baza->polecenie='Select * from pk_topics;';
-       $kolumny=array("topic_id","topic_title","topic_status");
-       $this->baza->wypisz_polecenie($kolumny);
-       
+       $this->watki=$this->baza->wypisz_polecenie();
     }
+    
 }
