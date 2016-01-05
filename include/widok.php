@@ -1,40 +1,73 @@
 <?php
+
 /**
- * Description of View
- *
- * @author piotr
+ * zarzÄ…dza szablonami smarty
+ * @author Piotr Kowal <piotr.kowal@polskapress.pl>
+ * @version 1.0
  */
-class widok {
-    public $szablon;
-    public $tytul;
+class include__widok {
+    /*
+     * @var Smarty $szablon obiekt Smarty
+     * @var String $tytul tytuÅ‚ strony
+     */
+
+    private $szablon;
+    private $tytul;
+
     /**
-     * Klasa, zarz±dzaj±ca widokami
+     * zarzÄ…dza szablonami smarty
      */
     public function __construct() {
-        require '/home/pkowal/www/smarty/Smarty.class.php';
-        $this->szablon=new Smarty;
+        $this->szablon = new Smarty;
     }
-    /**
-     * S³u¿y do wypisywania w±tków
-     * @param type $wartosc Tablica z w±tkami
+
+    /*
+     * Å‚aduje nagÅ‚Ã³wek strony
+     * @param String $tytul Tytul strony
      */
-    public function laduj_naglowek($tytul='Projekt Wstêpny'){
-        $this->tytul=$tytul;
-        $this->szablon->assign('tytul',$this->tytul);
+    public function laduj_naglowek($tytul = 'Projekt WstÄ™pny') {
+        $this->tytul = $tytul;
+        $this->szablon->assign('tytul', $this->tytul);
         $this->szablon->display("widoki/naglowek.tpl");
     }
-    public function laduj_widok($wartosc,$nazwa,$czy_jest_moderatorem){                          // z³±czyæ wati i posty do 1 funkcji
-        $this->szablon->assign($nazwa,$wartosc);
-        $this->szablon->assign('zalogowany',$_SESSION['zalogowany']);
-        $this->szablon->assign('czy_jest_moderatorem',$czy_jest_moderatorem);
+
+    /*
+     * Å‚aduje konkretny szablon
+     * @param array $wartosc tablica z zawartoscia tabeli
+     * @param string $nazwa nazwa zmiennej w szablonie
+     * @param boolean $czy_jest_moderatorem zmienna logiczna; okreÅ›la przywileje moderatora 
+     */
+    public function laduj_widok($wartosc, $nazwa, $czy_jest_moderatorem) {
+        $this->szablon->assign($nazwa, $wartosc);
+        $this->szablon->assign('zalogowany', $_SESSION['zalogowany']);
+        $this->szablon->assign('czy_jest_moderatorem', $czy_jest_moderatorem);
         $this->szablon->display("widoki/".$nazwa.".tpl");
-    }   
-    public function ustaw_tryb_moderatora($argument=0){
-        $this->szablon->assign('czy_jest_moderatorem',$argument);
     }
-    public function laduj_formularz($wartosc){
-        $this->szablon->assign('formularz',$wartosc);
+
+    /*
+     * Dodaje zmienna do szablonu
+     * @param string $nazwa nazwa zmiennej ktora ma byc umieszczona w szablonie
+     * @param mixed $wartosc wartosc zmiennej
+     */
+    public function dodaj($nazwa, $wartosc) {
+        $this->szablon->assign($nazwa, $wartosc);
+    }
+
+    /*
+     * Å‚aduje odpowiedni formularz
+     * @param string $wartosc nazwa formularza do wyswietlenia
+     */
+    public function laduj_formularz($wartosc) {
+        $this->szablon->assign('formularz', $wartosc);
         $this->szablon->display("widoki/formularz_logowania.tpl");
     }
-    
+
+    /*
+     * Å‚aduje szablon o wybranej nazwie
+     * @param string $nazwa nazwa szablonu do zaÅ‚adowania
+     */
+    public function laduj_inny_szablon($nazwa) {
+        $this->szablon->display("widoki/".$nazwa.".tpl");
     }
+
+}

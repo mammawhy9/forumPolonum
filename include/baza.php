@@ -4,54 +4,69 @@
  * Klasa do obslugi bazy danych
  *
  * @author piotr
+ * @version 1.0
  */
-class baza{
+class include__baza {
+    /*
+     * @var PDO $polaczenie obiekt do laczenia sie z baza danych
+     * @var String $polecenie zapytanie do bazy danych
+     */
+
     public $polaczenie;
     public $polecenie;
+
     /**
-    * Kontaktuje siê z baz± danych
-    * Dane do logowania bierze z konfiguracji.php
-    */
+     * Kontaktuje siÄ™ z bazÄ… danych
+     * Dane do logowania bierze z konfiguracji.php
+     *
+     */
     public function __construct() {
         require 'include/konfiguracja.php';
         $nazwa_bazy_hosta = 'mysql:dbname='.$dbname.';host='.$hostname;
         try {
-                $this->polaczenie = new PDO($nazwa_bazy_hosta, $username, $password);
-            }catch (PDOException $e) {
-                echo 'Connection failed: ' . $e->getMessage();
-            }
+            $this->polaczenie = new PDO(
+                $nazwa_bazy_hosta, $username, $password,
+                array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8')
+            );
+        } catch (PDOException $e) {
+            echo 'Connection failed: '.$e->getMessage();
+        }
     }
+
     /**
-    * Wypisuje zawarto¶æ tablicy
-    * @return ArrayObject  Zwraca tablicê z rekordami
-    */
-    public function wypisz_polecenie(){
-        $wynik_koncowy=new ArrayObject;
-        $wynik_posredni=$this->polaczenie->prepare($this->polecenie);
+     * wypisuje zawartoÅ›Ä‡ tablicy
+     * @return ArrayObject  Zwraca tablicÄ™ z rekordami
+     */
+    public function wypisz_polecenie() {
+        $wynik_posredni = $this->polaczenie->prepare($this->polecenie);
         $wynik_posredni->execute();
-        $wynik_koncowy=$wynik_posredni->fetchAll();
+        $wynik_koncowy = $wynik_posredni->fetchAll();
         return $wynik_koncowy;
     }
-    
-    public function aktualizuj($gdzie,$co,$na_co,$warunek){
-        $sql = "UPDATE pk_".$gdzie
-                . " SET ".$co."='".$na_co."'  WHERE ".$warunek.";";
-	$q = $this->polaczenie->prepare($sql);
-	$q->execute();
-    }
-    
-    public function dodaj_wartosci($gdzie,$kolumny,$wartosci){
-        
-        $sql = "insert into pk_".$gdzie
-        . "(".$kolumny.") values (".$wartosci.");";
-        
-    echo $sql;
-   $q = $this->polaczenie->prepare($sql);
-   $q->execute();
-    }
-        
-       
-    
 
+    /*
+     * aktualizuje zawartosc wybranej tabeli
+     * @param string $gdzie nazwa tabeli
+     * @param string $co nazwa kolumny    
+     * @param string $na_co wartoÅ›Ä‡, ktÃ³ra ma byÄ‡ przypisana do kolumny
+     * @param string $warunek warunek aktualizacji
+     */
+    public function aktualizuj($gdzie, $co, $na_co, $warunek) {
+        $tresc_zapytania = "UPDATE pk_".$gdzie." SET ".$co."='".$na_co."'  WHERE ".$warunek.";";
+        $zapytanie = $this->polaczenie->prepare($tresc_zapytania);
+        $zapytanie->execute();
+    }
+
+    /*
+     * dodaje wartosc do tabeli
+     * @param string $gdzie nazwa tabeli
+     * @param string $kolumny nazwy kolumn
+     * @param string $wartosci wartosci kolumn
+     */
+    public function dodaj_wartosci($gdzie, $kolumny, $wartosci) {
+        $tresc_zapytania = "insert into pk_".$gdzie."(".$kolumny.") values (".$wartosci.");";
+        $zapytanie = $this->polaczenie->prepare($tresc_zapytania);
+        $zapytanie->execute();
+    }
 
 }
