@@ -54,7 +54,7 @@ class model__uzytkownik extends model__abstrakt {
 
         $wynik = $this->pobierz($zapytanie);
         if (!empty($wynik)) {
-            return (bool)$wynik[0]["count(*)"];
+            return (bool)$wynik[0]['count(*)'];
         } else {
             return 0;
         }
@@ -67,8 +67,7 @@ class model__uzytkownik extends model__abstrakt {
      * @return array
      */
     public function pobierz_info($kolumny, $warunek = '') {
-        $nazwy_kolumn = null;
-        $nazwy_kolumn = implode('', $kolumny);
+        $nazwy_kolumn = implode($kolumny);
         $zapytanie = "
             SELECT ".$nazwy_kolumn."
             FROM ".$this->nazwa_tabeli."
@@ -108,7 +107,7 @@ class model__uzytkownik extends model__abstrakt {
 
     /**
      * wylogowywuje uzytkownika
-     * @param integer $uzykownik_id 
+     * @param integer $uzytkownik_id 
      */
     public function wyloguj($uzytkownik_id) {
         $this->aktualizuj('zalogowany', 0, ' uzytkownik_id='.$uzytkownik_id);
@@ -122,6 +121,32 @@ class model__uzytkownik extends model__abstrakt {
         $_SESSION['dane_poprawne'] = 0;
         $_SESSION['jest_moderatorem'] = 0;
         $_SESSION['uzytkownik_id'] = 0;
+    }
+
+    /**
+     * pobiera informacje potrzebne do zalogowania
+     * @param integer $uzytkownik_id
+     * @return array
+     */
+    public function pobierz_info_o_uzytkowniku($uzytkownik_id) {
+        $zapytanie = "
+            SELECT jest_moderatorem,uzytkownik_id,zalogowany,login
+            FROM pk_uzytkownicy 
+            WHERE uzytkownik_id='".$uzytkownik_id."';
+        ";
+
+        $wynik_zapytania = $this->pobierz($zapytanie);
+        if (!empty($wynik_zapytania)) {
+            $wynik['jest_moderatorem'] = $wynik_zapytania[0]['jest_moderatorem'];
+            $wynik['zalogowany'] = $wynik_zapytania[0]['zalogowany'];
+            $wynik['uzytkownik_id'] = $wynik_zapytania[0]['uzytkownik_id'];
+            $wynik['login'] = $wynik_zapytania[0]['login'];
+            return $wynik;
+        } else {
+            return array();
+        }
+            
+        
     }
 
 }

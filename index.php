@@ -6,7 +6,9 @@ function loader_klas($nazwa_klasy) {
     $sciezka = str_replace('__', '/', $nazwa_klasy);
     include $sciezka.'.php';
 }
-
+error_reporting(E_ALL);
+ini_set("display_errors", "on");
+ini_set("display_startup_errors", "on"); 
 spl_autoload_register('loader_klas');
 $czy_logowanie = isset($_GET['zaloguj']) || isset($_GET['zarejestruj']);
 $czy_watki = isset($_GET['watki']);

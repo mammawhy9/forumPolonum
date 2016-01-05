@@ -8,12 +8,20 @@
 abstract class model__abstrakt {
 
     /**
+     * 
      * @var string $nazwa_tabeli
-     * @var PDO $instancja_bazy
      */
     protected $nazwa_tabeli;
+    /**
+     *
+     * @var PDO $instancja_bazy 
+     */
     public $instancja_bazy_bazy;
 
+    /**
+     * 
+     * konstruktor klasy
+     */
     public function __construct() {
         $this->polacz_z_baza();
     }
@@ -69,17 +77,11 @@ abstract class model__abstrakt {
      * @param string $kolumny nazwy kolumn
      * @param string $wartosci wartosci kolumn
      */
-    public function dodaj_wartosci($kolumny, $wartosci) {
-        $nazwy_kolumn = null;
-        $wartosci_kolumn = null;
-        foreach ($kolumny as $wartosc) {
-            $nazwy_kolumn.=$wartosc.",";
-        }
-        foreach ($wartosci as $wartosc) {
-            $wartosci_kolumn.="'".$wartosc."',";
-        }
-        $nazwy_kolumn = rtrim($nazwy_kolumn, ', ');
-        $wartosci_kolumn = rtrim($wartosci_kolumn, ', ');
+    public function dodaj_wartosci($kolumny) {
+        $nazwy_kolumn =  implode(", ", array_keys($kolumny));
+        $wartosci_kolumn =  "'".implode("', '", $kolumny)."'";
+        
+        
         $tresc_zapytania = "
             INSERT INTO ".$this->nazwa_tabeli." ("
             .$nazwy_kolumn."
@@ -92,27 +94,12 @@ abstract class model__abstrakt {
         $zapytanie->execute();
     }
 
+
     /**
-     * pobiera informacje potrzebne do zalogowania
-     * @param integer $uzytkownik_id
-     * @return array
+     *  zabezpiecza przed sql injection
+     * @param string $zmienna
+     * @return string
      */
-    public function pobierz_info_o_uzytkowniku($uzytkownik_id) {
-        $zapytanie = "
-            SELECT jest_moderatorem,uzytkownik_id,zalogowany,login
-            FROM pk_uzytkownicy 
-            WHERE uzytkownik_id='".$uzytkownik_id."';
-        ";
-
-        $wynik_zapytania = $this->pobierz($zapytanie);
-
-        $wynik['jest_moderatorem'] = $wynik_zapytania[0]['jest_moderatorem'];
-        $wynik['zalogowany'] = $wynik_zapytania[0]['zalogowany'];
-        $wynik['uzytkownik_id'] = $wynik_zapytania[0]['uzytkownik_id'];
-        $wynik['login'] = $wynik_zapytania[0]['login'];
-        return $wynik;
-    }
-
     public function zabezpiecz($zmienna) {
         $wynik = htmlspecialchars($zmienna);
         $wynik = addslashes($wynik);

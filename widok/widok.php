@@ -27,7 +27,7 @@ class widok__widok {
      */
     public function laduj_formularz($wartosc) {
         $this->szablon->assign('formularz', $wartosc);
-        $this->szablon->display("widoki/formularz_logowania.tpl");
+        $this->szablon->display('widoki/formularz_logowania.tpl');
     }
 
     /**
@@ -35,7 +35,7 @@ class widok__widok {
      * @param string $nazwa nazwa szablonu do załadowania
      */
     public function laduj_inny_szablon($nazwa) {
-        $this->szablon->display("widoki/".$nazwa.".tpl");
+        $this->szablon->display('widoki/'.$nazwa.'.tpl');
     }
 
 }

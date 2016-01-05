@@ -11,10 +11,17 @@ class kontroler__uzytkownik {
     /**
      *
      * @var widok__widok $widok
-     * @var model__uzytkownik $dane_uzytkownika
      */
     public $widok;
+    /**
+     *
+     * @var model__uzytkownik $model 
+     */
     public $model;
+    /**
+     *
+     * @var model__uzytkownik $dane_uzytkownika
+     */
     public $dane_uzytkownika;
 
     /**
@@ -33,8 +40,7 @@ class kontroler__uzytkownik {
         $this->logowanie();
 
         if ($_SESSION['zalogowany']) {
-            $this->widok->laduj_formularz("wylogowanie");
-            $this->dane_uzytkownika = $this->model->pobierz_info_o_uzytkowniku($_SESSION['uzytkownik_id']);
+            $this->widok->laduj_formularz('wylogowanie');
         }
     }
 
@@ -42,11 +48,11 @@ class kontroler__uzytkownik {
      * sprawdza czy konieczne jest zaladowanie formularza
      */
     public function czy_logowac() {
-        $warunek_logowanie = (!$_SESSION['zalogowany']) && (!$_SESSION['dane_poprawne'])
-            && (isset($_POST['login'])) && (isset($_POST['zarejestruj'])) ? 1 : 0;
+        $warunek_logowanie = (!$_SESSION['zalogowany']) && (!$_SESSION['dane_poprawne']) && (isset($_POST['login']))
+            && (isset($_POST['zarejestruj']));
 
         if ($warunek_logowanie) {
-            $this->widok->laduj_formularz("logowanie");
+            $this->widok->laduj_formularz('logowanie');
         }
     }
 
@@ -57,11 +63,12 @@ class kontroler__uzytkownik {
         if (isset($_POST['login_rejestracja']) && isset($_POST['haslo_rejestracja'])) {
             $login = $_POST['login_rejestracja'];
             $haslo = $_POST['haslo_rejestracja'];
+            $sprawdzenie = isset($_GET['zarejestruj'])
+                && isset($_POST['nazwisko']) && isset($_POST['imie']) && !empty($haslo)
+                && !preg_match('/[\W]/', $login) && (!empty($login));
+        } else {
+            $sprawdzenie = 0;
         }
-
-        $sprawdzenie = isset($_GET['zarejestruj'])
-            && isset($_POST['nazwisko']) && isset($_POST['imie']) && !empty($haslo)
-            && !preg_match("/[\W]/", $login) && (!empty($login));
 
         if ($sprawdzenie) {
             $imie = $_POST['imie'];
@@ -82,7 +89,7 @@ class kontroler__uzytkownik {
     public function wylogowanie() {
         $warunek = isset($_POST['wyloguj']);
         if ($warunek) {
-            $czy_wylogowac = (bool) $_POST['wyloguj'];
+            $czy_wylogowac = (bool)$_POST['wyloguj'];
             if ($czy_wylogowac) {
                 $this->model->zeruj_zmienne_sesyjne();
                 $this->model->wyloguj($_SESSION['uzytkownik_id']);
@@ -98,16 +105,16 @@ class kontroler__uzytkownik {
      * @param string $haslo haslo użytkownika
      */
     public function rejestruj($imie, $nazwisko, $login, $haslo) {
-        $warunek_rejestracji = !$this->model->sprawdz_ilosc(array("login" => $login)) &&
-            !empty($login) && !empty($haslo);
+        if (!empty($login) && !empty($haslo)) {
+            $warunek_rejestracji = !$this->model->sprawdz_ilosc(array('login' => $login));
+        } else {
+            $warunek_rejestracji = 0;
+        }
         if ($warunek_rejestracji) {
-            $imie = $this->model->zabezpiecz($imie);
-            $nazwisko = $this->model->zabezpiecz($nazwisko);
-            $haslo = $this->model->zabezpiecz($haslo);
-            $login = $this->model->zabezpiecz($login);
-            $this->model->dodaj_wartosci(array('imie', 'nazwisko', 'login', 'haslo',
-                'jest_moderatorem'),
-                array($imie, $nazwisko, $login, crypt($haslo, CRYPT_BLOWFISH), 0));
+            $this->model->dodaj_wartosci(
+                array('imie' => $imie, 'nazwisko' => $nazwisko, 'login' => $login,
+                    'haslo' => crypt($haslo, CRYPT_BLOWFISH), 'jest_moderatorem' => 0)
+            );
         } else {
             $this->widok->laduj_inny_szablon('niewlasciwe_dane');
             $this->model->zeruj_zmienne_sesyjne();
@@ -118,23 +125,23 @@ class kontroler__uzytkownik {
      * obsluga logowania
      */
     public function logowanie() {
-        if (isset($_SESSION['zalogowany'])) {
-            // jeżeli niezalogowany to sprawdzamy czy przez post dostalismy jakis login i haslo 
-            if (!$_SESSION['zalogowany']) {
-                $warunek = isset($_POST['login']) && isset($_POST['haslo']);
-                if ($warunek) {
-                    $login = htmlspecialchars($_POST['login']);
-                    $haslo = htmlspecialchars($_POST['haslo']);
+        // jeżeli niezalogowany to sprawdzamy czy przez post dostalismy jakis login i haslo 
+        if (!$_SESSION['zalogowany']) {
+            $warunek = isset($_POST['login']) && isset($_POST['haslo']);
+            if ($warunek) {
+                $login = $_POST['login'];
+                $haslo = $_POST['haslo'];
+                $login = $this->model->zabezpiecz($login);
+                $haslo = $this->model->zabezpiecz($haslo);
 
-                    if (!empty($login) && !empty($haslo)) {
-                        $this->zaloguj($login, $haslo);
-                    } else {
-                        $this->widok->laduj_inny_szablon('niewlasciwe_dane');
-                        $this->widok->laduj_formularz("logowanie");
-                    }
+                if (!empty($login) && !empty($haslo)) {
+                    $this->zaloguj($login, $haslo);
                 } else {
-                    $this->widok->laduj_formularz("logowanie");
+                    $this->widok->laduj_inny_szablon('niewlasciwe_dane');
+                    $this->widok->laduj_formularz('logowanie');
                 }
+            } else {
+                $this->widok->laduj_formularz('logowanie');
             }
         }
     }
@@ -146,14 +153,14 @@ class kontroler__uzytkownik {
      */
     public function zaloguj($login, $haslo) {
         // sprawdzamy cz istnieje taki uzytkownik
-        $czy_istnieje_uzytkownik = $this->model->sprawdz_ilosc(array("login" => $login,
-            "haslo" => crypt($haslo, CRYPT_BLOWFISH)));
+        $czy_istnieje_uzytkownik = $this->model->sprawdz_ilosc(array('login' => $login,
+            'haslo' => crypt($haslo, CRYPT_BLOWFISH)));
 
         if ($czy_istnieje_uzytkownik) {
             $this->model->zaloguj($login, $haslo);
         } else {
             $this->widok->laduj_inny_szablon('niewlasciwe_dane');
-            $this->widok->laduj_formularz("logowanie");
+            $this->widok->laduj_formularz('logowanie');
             $this->model->zeruj_zmienne_sesyjne();
         }
     }

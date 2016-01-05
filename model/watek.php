@@ -17,7 +17,7 @@ class model__watek extends model__abstrakt {
      *
      * @var string $nazwa_tabeli
      */
-    public $nazwa_tabeli = "pk_watki";
+    public $nazwa_tabeli = 'pk_watki';
 
     /**
      * pobiera watki
@@ -42,6 +42,7 @@ class model__watek extends model__abstrakt {
         //jezeli nie jest zalogowany lub nie jest moderatorem, wyswietlamyh tylko watki ze statusem 'widoczny'
         $czy_moderator = (bool)$czy_moderator;
         $czy_zalogowany = (bool)$czy_zalogowany;
+        $warunek_watki = '';
         if (!$czy_zalogowany || !$czy_moderator) {
             $warunek_watki .= " status!='skasowany'"
                 ." AND status!='do_moderacji '"
@@ -61,15 +62,13 @@ class model__watek extends model__abstrakt {
     public function dodaj_watek($tytul_watku, $uzytkownik_id) {
         $tytul_watku = $this->zabezpiecz($tytul_watku);
         $uzytkownik_id = (int)$uzytkownik_id;
-        $this->dodaj_wartosci(array('tytul', 'autor'),
-            array($tytul_watku, $uzytkownik_id)
-        );
+        $this->dodaj_wartosci(array('tytul' => $tytul_watku, 'autor' => $uzytkownik_id));
     }
 
     /**
      * zmienia status watku
-     * @param string $tytul_watku
-     * @param integer $uzytkownik_id
+     * @param string $status_watku
+     * @param integer $watek_id
      */
     public function zmien_status_watku($status_watku, $watek_id) {
         $status_watku = $this->zabezpiecz($status_watku);

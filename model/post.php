@@ -26,12 +26,11 @@ class model__post extends model__abstrakt {
      * @param integer $uzytkownik_id
      */
     public function dodaj_post($post, $watek_id, $uzytkownik_id) {
-        $post = $this->zabezpiecz($post);
         $watek_id = (int)$watek_id;
-        $uzytkownik_id = (int) $uzytkownik_id;
+        $uzytkownik_id = (int)$uzytkownik_id;
         $this->dodaj_wartosci(
-            array('zawartosc', 'watek_id', 'autor'),
-            array($post, $watek_id, $uzytkownik_id));
+            array('zawartosc' => $post, 'watek_id' => $watek_id, 'autor' => $uzytkownik_id)
+        );
     }
 
     /**
@@ -55,29 +54,28 @@ class model__post extends model__abstrakt {
     public function filtruj_posty($czy_zalogowany, $czy_moderator) {
 
         $nr_watku = (int)$_GET['posty'];
-        $czy_moderator = (bool) $czy_moderator;
-        $czy_zalogowany = (bool) $czy_zalogowany;
-        $warunek_posty = "WHERE watek_id=".$nr_watku." ";
-
-        //jezeli nie jest zalogowany lub nie jest moderatorem, wyswietlamyh tylko posty z danego watku ze statusem 'widoczny'
-        if (!$czy_zalogowany || !$czy_moderator) {
-            $warunek_posty .= " AND  status!='skasowany' AND  status!='do_moderacji '"
-                ." AND  status!='ukryty' ";
-        }
-
-        $warunek_posty = "
-            LEFT JOIN pk_uzytkownicy 
-            ON pk_posty.autor=pk_uzytkownicy.uzytkownik_id ".$warunek_posty;
+        $czy_moderator = (bool)$czy_moderator;
+        $czy_zalogowany = (bool)$czy_zalogowany;
 
         $zapytanie = "
             SELECT post_id, zawartosc, watek_id, status,
                   pk_uzytkownicy.login
-            FROM ".$this->nazwa_tabeli." ".$warunek_posty.";
-        ";
+            FROM ".$this->nazwa_tabeli."
+            LEFT JOIN pk_uzytkownicy 
+            ON pk_posty.autor = pk_uzytkownicy.uzytkownik_id
+            WHERE watek_id = ".$nr_watku." ";
+
+        //jezeli nie jest zalogowany lub nie jest moderatorem, wyswietlamyh tylko posty z danego watku ze statusem 'widoczny'
+        if (!$czy_zalogowany || !$czy_moderator) {
+            $zapytanie .= " AND  status!='skasowany' AND  status!='do_moderacji '"
+                ." AND  status!='ukryty' ";
+        }
+
+
         $this->posty = $this->pobierz($zapytanie);
 
-        if (!empty($this->model->posty)) {
-            foreach ($this->model->posty as $post) {
+        if (!empty($this->posty)) {
+            foreach ($this->posty as $post) {
                 $post['zawartosc'] = stripslashes($post['zawartosc']);
             }
         }
