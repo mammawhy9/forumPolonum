@@ -1,18 +1,26 @@
 <?php
-/*
+/**
  * @author Piotr
  * @version 1.0
  */
 class kontroler__forum {
-
+    /**
+     * @var widok__widok $widok
+     * @var model__uzytkownik $uzytkownik
+     * @var string $nazwa_szablonu
+     * @var mixed $model
+     */
     private $model;
     private $widok;
     private $uzytkownik;
     private $nazwa_szablonu;
+
+    /**
+     * konstruktor klasy
+     * @param string $co_pokazac
+     */
     
     public function __construct($co_pokazac) {
-
-
         $this->widok = new widok__widok();
         if ($co_pokazac == 'posty') {
             $this->model = new model__post();
@@ -21,20 +29,21 @@ class kontroler__forum {
             $this->model = new model__watek();
             $this->nazwa_szablonu = 'watki.tpl';
         }
-        if ($_SESSION['uzytkownik_id']) {
+        $warunek=isset($_SESSION['uzytkownik_id'])&&$_SESSION['uzytkownik_id'];
+        if ($warunek) {
             $this->uzytkownik = $this->model->pobierz_info_o_uzytkowniku($_SESSION['uzytkownik_id']);
         }
 
         $this->ustaw_zmienne_sesji();
 
-        $this->inicjuj();
+        $this->laduj_widok();
        
     }
 
-    /*
-     * wyswietla wybrane info
+    /**
+     *  øaduje odpowiedni widok
      */
-    public function inicjuj() {
+    public function laduj_widok() {
 
         if (!empty($this->uzytkownik)) {
             $this->widok->szablon->assign('zalogowany', $_SESSION['zalogowany']);
@@ -58,10 +67,10 @@ class kontroler__forum {
         }
     }
 
-    /*
+    /**
      * pobiera i wyswietla posty 
-     * @param int $zalogowany
-     * @param int $czy_moderator
+     * @param integer $zalogowany
+     * @param integer $czy_moderator
      */
     public function pobierz_i_wyswietl_posty($zalogowany=0, $czy_moderator=0) {
         $this->czy_dodac_posty();
@@ -75,10 +84,10 @@ class kontroler__forum {
         $this->widok->szablon->display('widoki/posty.tpl');
     }
 
-    /*
+    /**
      * pobiera i wyswietla watki 
-     * @param int $zalogowany
-     * @param int $czy_moderator
+     * @param integer $zalogowany
+     * @param integer $czy_moderator
      */
     public function pobierz_i_wyswietl_watki($zalogowany=0, $czy_moderator=0) {
         $this->czy_dodac_watki();
@@ -88,29 +97,29 @@ class kontroler__forum {
         $this->widok->szablon->display('widoki/watki.tpl');
     }
 
-    /*
+    /**
      * sprawdza czy trzeba aktualizować posty
      */
     public function czy_aktualizowac_posty() {
         $potwierdzenie = isset($_POST['post_id'])
             && $_SESSION['czy_jest_moderatorem']
-            && isset($_POST['post_id']) ? 1 : 0;
+            && isset($_POST['post_id']);
 
         if ($potwierdzenie) {
-            $status_postu = (string) $_POST['zmiana_statusu_postu'];
+            $status_postu = $this->model->zabezpiecz($status_postu);
             $post_id = (int) $_POST['post_id'];
             $this->model->zmien_status_postu($status_postu, $post_id);
         }
     }
 
-    /*
+    /**
      * sprawdza czy dodać post 
      */
     public function czy_dodac_posty() {
         $warunek = isset($_POST['zawartosc']);
         if ($warunek) {
-            $post = htmlspecialchars($_POST['zawartosc']);
-            $post = addslashes($post);
+            $post =(string)$_POST['zawartosc'];
+            $post = $this->model->zabezpiecz($post);
             if (!empty($post)) {
                 $watek_id = (int) $_POST['watek_id'];
                 $this->model->dodaj_post($post, $watek_id,
@@ -119,12 +128,14 @@ class kontroler__forum {
         }
     }
 
-    /*
+    /**
      * sprawdza czy dodać wątek 
      */
     public function czy_dodac_watki() {
-        if (isset($_POST['tytul_watku'])) {
-            $tytul_watku = htmlspecialchars($_POST['tytul_watku']);
+        $warunek=isset($_POST['tytul_watku']);
+        if ($warunek) {
+            $tytul_watku = $_POST['tytul_watku'];
+            $tytul_watku=$this->model->zabezpiecz($tytul_watku);
             if (!empty($tytul_watku)) {
                 $this->model->dodaj_watek($tytul_watku,
                     $_SESSION['uzytkownik_id']);
@@ -134,7 +145,7 @@ class kontroler__forum {
         }
     }
 
-    /*
+    /**
      * sprawdza czy trzeba aktualizować wątki
      */
     public function czy_aktualizowac_watki() {
@@ -149,7 +160,7 @@ class kontroler__forum {
         }
     }
 
-    /*
+    /**
      * pobiera zmienne do logowania z bazy danych
      */
     public function ustaw_zmienne_sesji() {

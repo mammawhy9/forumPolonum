@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * model dla tabeli pk_uzytkownicy
  *
  * @author piotr
@@ -11,7 +11,7 @@ class model__uzytkownik extends model__abstrakt {
     private $baza;
     public $nazwa_tabeli = "pk_uzytkownicy";
 
-    /*
+    /**
      * Sprawdza czy uzytkownik jest moderatorem
      * @param string $login
      * return int
@@ -23,12 +23,18 @@ class model__uzytkownik extends model__abstrakt {
         return (int) $wynik_zapytania[0]['jest_moderatorem'];
     }
 
-    /*
+    /**
      * sprawdza ilosc wytepowania danego elementu
      * @param string $warunek
      */
     public function sprawdz_ilosc($warunek) {
-        $zapytanie = "Select count(*) from ".$this->nazwa_tabeli." where ".$warunek.";";
+        $warunek_zapytania=null;
+        foreach($warunek as $klucz => $wartosc){
+            $warunek_zapytania.=''.$klucz.' = "'.$wartosc.'" and ';
+        }
+        $warunek_zapytania=rtrim($warunek_zapytania,' and ');
+        $zapytanie = "Select count(*) from ".$this->nazwa_tabeli." where ".$warunek_zapytania.";";
+        echo var_dump($zapytanie);
         $wynik = $this->pobierz($zapytanie);
         if (!empty($wynik)) {
             return (bool) $wynik[0]["count(*)"];
@@ -37,14 +43,14 @@ class model__uzytkownik extends model__abstrakt {
         }
     }
 
-    /*
+    /**
      * pobiera wybrane kolumny
      * @param array $kolumny
      * @param string $warunek
      * @return array
      */
     public function pobierz_info($kolumny, $warunek = '') {
-        $nazwy_koslumn = null;
+        $nazwy_kolumn = null;
         foreach ($kolumny as $wartosc) {
             $nazwy_kolumn.=$wartosc.' ';
         }
@@ -56,7 +62,7 @@ class model__uzytkownik extends model__abstrakt {
         return $this->pobierz($zapytanie);
     }
 
-    /*
+    /**
      * zalogowywuje uzytkownika
      * @param string $login
      * @param string $haslo
@@ -83,7 +89,7 @@ class model__uzytkownik extends model__abstrakt {
         $_SESSION['uzytkownik_id'] = $uzytkownik_id[0]['uzytkownik_id'];
     }
 
-    /*
+    /**
      * wylogowywuje uzytkownika
      * @param int $uzykownik_id 
      */
@@ -91,7 +97,7 @@ class model__uzytkownik extends model__abstrakt {
         $this->aktualizuj('zalogowany', 0, ' uzytkownik_id='.$uzytkownik_id);
     }
 
-    /*
+    /**
      *  inicjalizuje/zeruje potrzebne do działania zmienne sesyjne
      */
     public function zeruj_zmienne_sesyjne() {

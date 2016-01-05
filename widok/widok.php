@@ -1,26 +1,26 @@
 <?php
 
-/*
+/**
  * zarządza szablonami smarty
  * @author Piotr Kowal <piotr.kowal@polskapress.pl>
  * @version 1.0
  */
 class widok__widok {
-    /*
+    /**
      * @var Smarty $szablon obiekt Smarty
      * 
      */
 
     public $szablon;
 
-    /**
+    /***
      * zarządza szablonami smarty
      */
     public function __construct() {
         $this->szablon = new Smarty;
     }
 
-    /*
+    /**
      * ładuje odpowiedni formularz
      * @param string $wartosc nazwa formularza do wyswietlenia
      */
@@ -29,7 +29,7 @@ class widok__widok {
         $this->szablon->display("widoki/formularz_logowania.tpl");
     }
 
-    /*
+    /**
      * ładuje szablon o wybranej nazwie
      * @param string $nazwa nazwa szablonu do załadowania
      */

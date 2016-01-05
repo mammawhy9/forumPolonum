@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * model dla pk_post
  *
  * @author piotr
@@ -11,7 +11,7 @@ class model__post extends model__abstrakt {
     public $posty;
     public $nazwa_tabeli = 'pk_posty';
 
-    /*
+    /**
      * dodaje post
      * @param string $post
      * @param int $watek_id
@@ -23,25 +23,26 @@ class model__post extends model__abstrakt {
             array($post, $watek_id, $uzytkownik_id));
     }
 
-    /*
+    /**
      * pobiera posty
      */
     public function pobierz_posty() {
-        $zapytanie = "Select ".$kolumny." from".$this->nazwa_tabeli." ".$warunek.";";
+        $zapytanie = "select ".$kolumny." from".$this->nazwa_tabeli." ".$warunek.";";
     }
 
-    /*
+    /**
      * zmienia status postu
      * @param string $status_postu
      * @param int $post_id
      */
     public function zmien_status_postu($status_postu, $post_id) {
+        $status_postu= $this->zabezpiecz($status_postu);
         $this->aktualizuj(
             'status', $status_postu, "post_id='".$post_id."'"
         );
     }
 
-    /*
+    /**
      * filtruje posty do wyświetlenia 
      * @param int $czy_zalogowany
      * @param int $czy_moderator
@@ -53,8 +54,7 @@ class model__post extends model__abstrakt {
 
         //jezeli nie jest zalogowany lub nie jest moderatorem, wyswietlamyh tylko posty z danego watku ze statusem 'widoczny'
         if (!$czy_zalogowany || !$czy_moderator) {
-            $warunek_posty .= " and  status!='skasowany'"
-                ."and  status!='do_moderacji '"
+            $warunek_posty .= " and  status!='skasowany' and  status!='do_moderacji '"
                 ."and  status!='ukryty' ";
         }
 
@@ -73,7 +73,7 @@ class model__post extends model__abstrakt {
         }
     }
 
-    /*
+    /**
      * pobiera tytul watku
      * @param int $watek_id
      */

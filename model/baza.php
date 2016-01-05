@@ -1,13 +1,13 @@
 <?php
 
-/*
+/**
  * Klasa do obslugi bazy danych
  *
  * @author piotr
  * @version 1.0
  */
 class model__baza {
-    /*
+    /**
      * Kontaktuje się z bazą danych
      * Dane do logowania bierze z konfiguracji.php
      *

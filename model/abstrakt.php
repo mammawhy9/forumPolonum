@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * abstrakcyjna klasa dla modeli
  * @author piotr
  * @version 1.0
@@ -14,7 +14,7 @@ abstract class model__abstrakt {
         $this->instancja = model__baza::polacz_z_baza();
     }
 
-    /*
+    /**
      * wypisuje zawartość tablicy
      * @return ArrayObject  Zwraca tablicę z rekordami
      */
@@ -25,7 +25,7 @@ abstract class model__abstrakt {
         return $wynik_koncowy;
     }
 
-    /*
+    /**
      * aktualizuje zawartosc  tabeli
      * @param string $co nazwa kolumny    
      * @param string $na_co wartość, która ma być przypisana do kolumny
@@ -40,7 +40,7 @@ abstract class model__abstrakt {
         $zapytanie->execute();
     }
 
-    /*
+    /**
      * dodaje wartosc do tabeli
      * @param string $kolumny nazwy kolumn
      * @param string $wartosci wartosci kolumn
@@ -63,12 +63,12 @@ abstract class model__abstrakt {
             .$wartosci_kolumn."
             );
         ";
-  
+
         $zapytanie = $this->instancja->prepare($tresc_zapytania);
         $zapytanie->execute();
     }
 
-    /*
+    /**
      * pobiera informacje potrzebne do zalogowania
      * @param int $uzytkownik_id
      * @return Arrayobject
@@ -88,5 +88,10 @@ abstract class model__abstrakt {
         $wynik['login']=$wynik_zapytania[0]['login'];
         return $wynik;
     }
-
+    
+    public function zabezpiecz($zmienna){
+        $wynik=  htmlspecialchars($zmienna);
+        $wynik= addslashes($wynik);
+        return $wynik;
+    }
 }

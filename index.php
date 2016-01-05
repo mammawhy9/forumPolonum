@@ -7,6 +7,8 @@ function loader_klas($nazwa_klasy) {
     include $sciezka.'.php';
 }
 
+ini_set( 'display_errors', 'On' ); 
+error_reporting( E_ALL );
 spl_autoload_register('loader_klas');
 $czy_logowanie=isset($_GET['zaloguj']) || isset($_GET['zarejestruj']);
 $czy_watki=isset($_GET['watki']);
@@ -20,4 +22,3 @@ if ($czy_logowanie) {
 } else {
     $kontroler = new kontroler__forum('watki');
 }
-

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Model dla tabeli pk_watki
  *
  * @author piotr
@@ -11,7 +11,7 @@ class model__watek extends model__abstrakt {
     public $watki;
     public $nazwa_tabeli = "pk_watki";
 
-    /*
+    /**
      * pobiera watki
      * @param string $warunek
      */
@@ -25,7 +25,7 @@ class model__watek extends model__abstrakt {
         $this->watki = $this->pobierz($zapytanie);
     }
 
-    /*
+    /**
      * wybiera ktore watki maja byc pobrane
      * @param int $czy_zalogowany
      * @param int $czy_moderator
@@ -45,19 +45,18 @@ class model__watek extends model__abstrakt {
         
     }
 
-    /*
+    /**
      * dodaje watek
      * @param string $tytul_watku
      * @param int $uzytkownik_id
      */
     public function dodaj_watek($tytul_watku, $uzytkownik_id) {
-        $tytul_watku = addslashes($tytul_watku);
         $this->dodaj_wartosci(array('tytul', 'autor'),
             array($tytul_watku,$uzytkownik_id)
         );
     }
 
-    /*
+    /**
      * zmienia status watku
      * @param string $tytul_watku
      * @param int $uzytkownik_id

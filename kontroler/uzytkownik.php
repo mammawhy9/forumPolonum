@@ -1,43 +1,44 @@
 <?php
 
-/*
+/**
  * kontroler dla logowa nie
  *
  * @author piotr
  * @version 1.0
  */
 class kontroler__uzytkownik {
-
+/**
+ *
+ * @var widok__widok $widok
+ * @var model__uzytkownik $dane_uzytkownika
+ */
     public $widok;
     public $model;
     public $dane_uzytkownika;
-
+    
+    /**
+     * domyßlny konstruktor klasy
+     */
     public function __construct() {
         $this->widok = new widok__widok();
         $this->model = new model__uzytkownik();
 
         if (!isset($_SESSION['zalogowany'])) {
-            $this->zeruj_zmienne_sesyjne();
+            $this->model->zeruj_zmienne_sesyjne();
         }
-        $this->inicjuj();
-    }
-
-    /*
-     * loguje/wylogowywuje uzytkownika
-     */
-    public function inicjuj() {
         $this->czy_rejestrowac();
         $this->czy_logowac();
         $this->wylogowanie();
         $this->logowanie();
-        
+
         if ($_SESSION['zalogowany']) {
             $this->widok->laduj_formularz("wylogowanie");
             $this->dane_uzytkownika = $this->model->pobierz_info_o_uzytkowniku($_SESSION['uzytkownik_id']);
         }
+        
     }
-
-    /*
+    
+    /**
      * sprawdza czy konieczne jest zaladowanie formularza
      */
     public function czy_logowac() {
@@ -49,30 +50,30 @@ class kontroler__uzytkownik {
         }
     }
 
-    /*
+    /**
      * sprawdza czy rejestrowac; jezeli tak to rejestruje
      */
     public function czy_rejestrowac() {
-        $sprawdzenie = isset($_GET['zarejestruj']) && ($_GET['zarejestruj'])
-            && isset($_POST['login_rejestracja']) && isset($_POST['login_rejestracja']);
-        if ($sprawdzenie) {
-            $login = $_POST['login_rejestracja'];
+        $sprawdzenie = isset($_GET['zarejestruj']) && ($_GET['zarejestruj'])&& isset($_POST['login_rejestracja']) && isset($_POST['haslo_rejestracja'])
+            && empty($_POST['haslo_rejestracja'])&& isset($_POST['nazwisko'])&& isset($_POST['imie']) && !empty($_POST['haslo_rejestracja'])
+            &&!preg_match("/[\W]/", $login) && (!empty($login));
 
-            if (!preg_match("/[\W]/", $login) && (!empty($login))) {
-                $imie = htmlspecialchars($_POST['imie']);
-                $nazwisko = htmlspecialchars($_POST['nazwisko']);
-                $login = htmlspecialchars($_POST['login_rejestracja']);
-                $haslo = htmlspecialchars($_POST['haslo_rejestracja']);
+        if ($sprawdzenie) {
+                $imie = $_POST['imie'];
+                $nazwisko = $_POST['nazwisko'];
+                $login = $_POST['login_rejestracja'];
+                $haslo = $_POST['haslo_rejestracja'];
+                $login=$this->model->zabezpiecz($login);
+                $haslo = $this->model->zabezpiecz($haslo);
+                $imie= $this->model->zabezpiecz($imie);
+                $nazwisko= $this->model->zabezpiecz($nazwisko);
                 $this->rejestruj($imie, $nazwisko, $login, $haslo);
-            } else {
+            } elseif(isset($_GET['zarejestruj'])) {
                 $this->widok->laduj_inny_szablon('niewlasciwe_dane');
             }
-        } elseif (isset($_GET['zarejestruj'])) {
-            $this->widok->laduj_inny_szablon('niewlasciwe_dane');
-        }
     }
 
-    /*
+    /**
      * wylogowanie użytkownika przez wyzerowanie zmiennych sesyjnych i wpis do bazy
      */
     public function wylogowanie() {
@@ -86,7 +87,7 @@ class kontroler__uzytkownik {
         }
     }
 
-    /*
+    /**
      * rejestrowanie uzytkownika
      * @param string $imie imię użytkownika
      * @param string $nazwisko nazwisko użytkownika
@@ -94,10 +95,9 @@ class kontroler__uzytkownik {
      * @param string $haslo haslo użytkownika
      */
     public function rejestruj($imie, $nazwisko, $login, $haslo) {
-        $warunek_rejestracji = $this->model->sprawdz_ilosc(" login='".$login."'")
-            && !empty($login) && !empty($haslo);
-
-        if (!$warunek_rejestracji) {
+        $warunek_rejestracji = $this->model->sprawdz_ilosc(array("login"=>$login))&& !empty($login) && !empty($haslo);
+        
+        if ($warunek_rejestracji) {
             $this->model->dodaj_wartosci(array('imie', 'nazwisko', 'login', 'haslo',
                 'jest_moderatorem'),
                 array($imie, $nazwisko,$login,crypt($haslo,CRYPT_BLOWFISH),0));
@@ -107,7 +107,7 @@ class kontroler__uzytkownik {
         }
     }
 
-    /*
+    /**
      * obsluga logowania
      */
     public function logowanie() {
@@ -132,16 +132,14 @@ class kontroler__uzytkownik {
         }
     }
 
-    /*
+    /**
      * logowanie uzytkownika i nadawanie mu praw oraz pobieranie id uzytkownika
-     * @param String $login Login do konta
-     * @param String $haslo Hasło do konta
+     * @param string $login Login do konta
+     * @param string $haslo Hasło do konta
      */
     public function zaloguj($login, $haslo) {
         // sprawdzamy cz istnieje taki uzytkownik
-        $czy_istnieje_uzytkownik = $this->model->sprawdz_ilosc(
-            " login='".$login."'"." and haslo='".crypt($haslo, CRYPT_BLOWFISH)."'"
-        );
+        $czy_istnieje_uzytkownik = $this->model->sprawdz_ilosc(array("login" => $login, "haslo" => crypt($haslo, CRYPT_BLOWFISH)));
 
         if ($czy_istnieje_uzytkownik) {
             $this->model->zaloguj($login, $haslo);
