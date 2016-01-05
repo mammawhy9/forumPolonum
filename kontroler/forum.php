@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author Piotr
  * @version 1.0
  */
 class kontroler__forum {
+
     /**
      * @var widok__widok $widok
      * @var model__uzytkownik $uzytkownik
@@ -19,7 +21,6 @@ class kontroler__forum {
      * konstruktor klasy
      * @param string $co_pokazac
      */
-    
     public function __construct($co_pokazac) {
         $this->widok = new widok__widok();
         if ($co_pokazac == 'posty') {
@@ -29,7 +30,7 @@ class kontroler__forum {
             $this->model = new model__watek();
             $this->nazwa_szablonu = 'watki.tpl';
         }
-        $warunek=isset($_SESSION['uzytkownik_id'])&&$_SESSION['uzytkownik_id'];
+        $warunek = isset($_SESSION['uzytkownik_id']) && $_SESSION['uzytkownik_id'];
         if ($warunek) {
             $this->uzytkownik = $this->model->pobierz_info_o_uzytkowniku($_SESSION['uzytkownik_id']);
         }
@@ -37,7 +38,6 @@ class kontroler__forum {
         $this->ustaw_zmienne_sesji();
 
         $this->laduj_widok();
-       
     }
 
     /**
@@ -72,7 +72,7 @@ class kontroler__forum {
      * @param integer $zalogowany
      * @param integer $czy_moderator
      */
-    public function pobierz_i_wyswietl_posty($zalogowany=0, $czy_moderator=0) {
+    public function pobierz_i_wyswietl_posty($zalogowany = 0, $czy_moderator = 0) {
         $this->czy_dodac_posty();
         $this->czy_aktualizowac_posty();
         $this->model->filtruj_posty($zalogowany, $czy_moderator);
@@ -89,7 +89,7 @@ class kontroler__forum {
      * @param integer $zalogowany
      * @param integer $czy_moderator
      */
-    public function pobierz_i_wyswietl_watki($zalogowany=0, $czy_moderator=0) {
+    public function pobierz_i_wyswietl_watki($zalogowany = 0, $czy_moderator = 0) {
         $this->czy_dodac_watki();
         $this->czy_aktualizowac_watki();
         $this->model->filtruj_watki($zalogowany, $czy_moderator);
@@ -101,11 +101,10 @@ class kontroler__forum {
      * sprawdza czy trzeba aktualizować posty
      */
     public function czy_aktualizowac_posty() {
-        $potwierdzenie = isset($_POST['post_id'])
-            && $_SESSION['czy_jest_moderatorem']
-            && isset($_POST['post_id']);
+        $potwierdzenie = isset($_POST['post_id']) && $_SESSION['czy_jest_moderatorem'] && isset($_POST['post_id']);
 
         if ($potwierdzenie) {
+            $status_postu = $_POST['zmiana_statusu_postu'];
             $status_postu = $this->model->zabezpiecz($status_postu);
             $post_id = (int) $_POST['post_id'];
             $this->model->zmien_status_postu($status_postu, $post_id);
@@ -118,7 +117,7 @@ class kontroler__forum {
     public function czy_dodac_posty() {
         $warunek = isset($_POST['zawartosc']);
         if ($warunek) {
-            $post =(string)$_POST['zawartosc'];
+            $post = (string) $_POST['zawartosc'];
             $post = $this->model->zabezpiecz($post);
             if (!empty($post)) {
                 $watek_id = (int) $_POST['watek_id'];
@@ -132,10 +131,10 @@ class kontroler__forum {
      * sprawdza czy dodać wątek 
      */
     public function czy_dodac_watki() {
-        $warunek=isset($_POST['tytul_watku']);
+        $warunek = isset($_POST['tytul_watku']);
         if ($warunek) {
             $tytul_watku = $_POST['tytul_watku'];
-            $tytul_watku=$this->model->zabezpiecz($tytul_watku);
+            $tytul_watku = $this->model->zabezpiecz($tytul_watku);
             if (!empty($tytul_watku)) {
                 $this->model->dodaj_watek($tytul_watku,
                     $_SESSION['uzytkownik_id']);
@@ -154,7 +153,7 @@ class kontroler__forum {
             && isset($_POST['zmiana_statusu_watku'])) ? 1 : 0;
 
         if ($czy_aktualizowac_watki) {
-            $status_watku = (string)$_POST['zmiana_statusu_watku'];
+            $status_watku = (string) $_POST['zmiana_statusu_watku'];
             $watek_id = (int) $_POST['watek_id'];
             $this->model->zmien_status_watku($status_watku, $watek_id);
         }

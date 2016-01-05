@@ -7,14 +7,15 @@
  */
 class widok__widok {
     /**
-     * @var Smarty $szablon obiekt Smarty
      * 
+     * @var Smarty $szablon obiekt Smarty
      */
 
     public $szablon;
 
-    /***
-     * zarządza szablonami smarty
+    /**
+     * 
+     * domyslny konstruktor
      */
     public function __construct() {
         $this->szablon = new Smarty;

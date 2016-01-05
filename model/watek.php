@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model dla tabeli pk_watki
  *
@@ -7,8 +8,15 @@
  */
 class model__watek extends model__abstrakt {
 
-    //funkcje dodaj watek, zmien status watku
+    /**
+     *
+     * @var array $watki
+     */
     public $watki;
+    /**
+     *
+     * @var string $nazwa_tabeli
+     */
     public $nazwa_tabeli = "pk_watki";
 
     /**
@@ -17,51 +25,55 @@ class model__watek extends model__abstrakt {
      */
     public function pobierz_watki($warunek) {
         $zapytanie = "
-            Select * 
-            from ".$this->nazwa_tabeli;
+            SELECT tytul, status, autor, watek_id 
+            FROM ".$this->nazwa_tabeli;
         if (!empty($warunek)) {
-            $zapytanie.=" where ".$warunek;
+            $zapytanie.=" WHERE ".$warunek;
         }
         $this->watki = $this->pobierz($zapytanie);
     }
 
     /**
      * wybiera ktore watki maja byc pobrane
-     * @param int $czy_zalogowany
-     * @param int $czy_moderator
+     * @param integer $czy_zalogowany
+     * @param integer $czy_moderator
      */
     public function filtruj_watki($czy_zalogowany, $czy_moderator) {
         //jezeli nie jest zalogowany lub nie jest moderatorem, wyswietlamyh tylko watki ze statusem 'widoczny'
-        $warunek_watki = '';
+        $czy_moderator = (bool)$czy_moderator;
+        $czy_zalogowany = (bool)$czy_zalogowany;
         if (!$czy_zalogowany || !$czy_moderator) {
             $warunek_watki .= " status!='skasowany'"
-                ." and status!='do_moderacji '"
-                ." and  status!='ukryty'; ";
+                ." AND status!='do_moderacji '"
+                ." AND status!='ukryty'; ";
         } else {
             $warunek_watki = '';
         }
 
         $this->pobierz_watki($warunek_watki);
-        
     }
 
     /**
      * dodaje watek
      * @param string $tytul_watku
-     * @param int $uzytkownik_id
+     * @param integer $uzytkownik_id
      */
     public function dodaj_watek($tytul_watku, $uzytkownik_id) {
+        $tytul_watku = $this->zabezpiecz($tytul_watku);
+        $uzytkownik_id = (int)$uzytkownik_id;
         $this->dodaj_wartosci(array('tytul', 'autor'),
-            array($tytul_watku,$uzytkownik_id)
+            array($tytul_watku, $uzytkownik_id)
         );
     }
 
     /**
      * zmienia status watku
      * @param string $tytul_watku
-     * @param int $uzytkownik_id
+     * @param integer $uzytkownik_id
      */
     public function zmien_status_watku($status_watku, $watek_id) {
+        $status_watku = $this->zabezpiecz($status_watku);
+        $watek_id = (int)$watek_id;
         $this->aktualizuj('status', $status_watku, "watek_id='".$watek_id."'");
     }
 
