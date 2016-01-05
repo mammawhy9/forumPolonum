@@ -1,11 +1,14 @@
+
+{$tytul_watku}<br/>
+<a href="?watki=1"><button>Wróć do wątków</button></a>
 {foreach from=$posty item=wartosc}
-   <div>
-       <p><strong>{$wartosc.login}</strong> </p>
-       <p>{$wartosc.zawartosc} ->  {$wartosc.status}</p>
-   </div>    
-        {if $czy_jest_moderatorem==1}       
+    <div>
+        <p><strong>{$wartosc.login}</strong> </p>
+        <p>{$wartosc.zawartosc} ->  {$wartosc.status}</p>
+    </div>    
+    {if $czy_jest_moderatorem==1}       
         <div>
-            <form action='.?nr_watku={$wartosc.watek_id}' method='post'>
+            <form action='.?posty={$wartosc.watek_id}' method='post'>
                 <fieldset>
                     <select name="zmiana_statusu_postu">
                         <option value="do_moderacji">Do moderacji</option>
@@ -18,12 +21,12 @@
                 </fieldset>    
             </form>
         </div>
-        {/if}
+    {/if}
 {/foreach}
 
 {if $zalogowany==1}
     {if isset($watek_id)}
-        <form action='.?nr_watku={$watek_id}' method='post' maxlength='120'>
+        <form action='.?posty={$watek_id}' method='post' maxlength='120'>
             <fieldset>
                 <textarea rows="4" cols="50" name='zawartosc'></textarea><br/>
                 <input type='hidden' name="watek_id" value='{$watek_id}'  /> 

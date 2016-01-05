@@ -1,23 +1,34 @@
+{if $zalogowany==1}
+    <form action='.?zaloguj=1' method='post'>
+        <fieldset>
+            <input type='hidden' value='true' name='wyloguj'/>
+            <input type='submit' value='Wyloguj'/>
+        </fieldset>        
+    </form>
+{else}
+    <a href=".?zaloguj=1"><button>Zaloguj</button></a>
+
+{/if}
 {foreach from=$watki item=wartosc}
     <div id='watek'>
-        <a href='.?nr_watku={$wartosc.watek_id}'>
+        <a href='.?posty={$wartosc.watek_id}'>
             {$wartosc.tytul}
         </a> 
-            {$wartosc.status} 
+        {$wartosc.status} 
         {if $czy_jest_moderatorem==1}       
-        
-        <form action='.' method='post'>
-            <fieldset>
-                <select name="zmiana_statusu_watku">
-                    <option value="do_moderacji">Do moderacji</option>
-                    <option value="skasowany">Skasuj</option>
-                    <option value="ukryty">Ukryj</option>
-                    <option value="widoczny">Widoczny</option>
-                </select>
-                <input type='hidden' name="watek_id" value='{$wartosc.watek_id}'  />                
-                <input type='submit' value='Zmień'  />
-            </fieldset>    
-        </form>     
+
+            <form action='.?watki=1' method='post'>
+                <fieldset>
+                    <select name="zmiana_statusu_watku">
+                        <option value="do_moderacji">Do moderacji</option>
+                        <option value="skasowany">Skasuj</option>
+                        <option value="ukryty">Ukryj</option>
+                        <option value="widoczny">Widoczny</option>
+                    </select>
+                    <input type='hidden' name="watek_id" value='{$wartosc.watek_id}'  />                
+                    <input type='submit' value='Zmień'  />
+                </fieldset>    
+            </form>     
         {/if}<br>
     </div>    
 {/foreach}
