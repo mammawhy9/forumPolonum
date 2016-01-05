@@ -37,7 +37,8 @@ abstract class model__abstrakt {
      * @param string $warunek warunek aktualizacji
      */
     public function aktualizuj($co, $na_co, $warunek) {
-        $tresc_zapytania = "UPDATE ".$gdzie." SET ".$co."='".$na_co."'  WHERE ".$warunek.";";
+        $tresc_zapytania = "UPDATE ".$this->nazwa_tabeli." SET ".$co."='".$na_co."'  WHERE ".$warunek.";";
+        echo $tresc_zapytania;
         $zapytanie = $this->polaczenie->prepare($tresc_zapytania);
         $zapytanie->execute();
     }
@@ -61,5 +62,11 @@ abstract class model__abstrakt {
         echo $tresc_zapytania;
         $zapytanie = $this->polaczenie->prepare($tresc_zapytania);
         $zapytanie->execute();
+    }
+    
+    public function pobierz_info_o_uzytkowniku($login){
+        $zapytanie="Select jest_moderatorem,uzytkownik_id,zalogowany,login from pk_uzytkownicy where login='".$login."';";
+        echo $zapytanie;
+        return $this->pobierz($zapytanie);
     }
 }

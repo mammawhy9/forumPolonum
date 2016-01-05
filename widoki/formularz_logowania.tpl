@@ -1,13 +1,13 @@
 
 {if $formularz=="logowanie"}
-    <form action='.' method='post'>
+    <form action='.?zaloguj=1' method='post'>
         <fieldset>
             <input type='text' name='login'/><br>
             <input type='password' name='haslo'/><br>
             <input type='submit' value='zaloguj'  />
         </fieldset>
     </form>
-    <form action='.?zarejestruj' method='post'>
+    <form action='.?zarejestruj=1' method='post'>
         <fieldset>
         Login:    <input type='text' name='login_rejestracja'/><br>
         Haslo:    <input type='password' name='haslo_rejestracja'/><br>

@@ -25,7 +25,7 @@
     {if isset($watek_id)}
         <form action='.?nr_watku={$watek_id}' method='post' maxlength='120'>
             <fieldset>
-                <textarea rows="4" cols="50" name='zawartosc'>Tu wpisz swój post!</textarea><br/>
+                <textarea rows="4" cols="50" name='zawartosc'></textarea><br/>
                 <input type='hidden' name="watek_id" value='{$watek_id}'  /> 
                 <input type='submit' value='Dodaj Post!'  />
             </fieldset>

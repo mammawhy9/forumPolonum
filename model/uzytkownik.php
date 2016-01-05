@@ -43,5 +43,11 @@ class model__uzytkownik extends model__abstrakt {
         return $this->pobierz($zapytanie);
         
     }
+    public function zaloguj($login){
+        $this->aktualizuj('zalogowany', 1,' login="'.$login.'"');
+    }
+    public function wyloguj($login){
+        $this->aktualizuj('zalogowany', 0,' login="'.$login.'"');
+    }
 
 }

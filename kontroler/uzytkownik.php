@@ -85,12 +85,13 @@ class kontroler__uzytkownik {
     /*
      * wylogowanie użytkownika przez wyzerowanie zmiennych sesyjnych
      */
-    public function wylogowanie() {
+    public function wylogowanie($login) {
         echo isset($_POST['wyloguj']);
         if (isset($_POST['wyloguj'])) {
             $czy_wylogowac = (bool) $_POST['wyloguj'];
             if ($czy_wylogowac) {
                 $this->zeruj_zmienne_sesyjne();
+                $this->model->wyloguj($login);
             }
         }
     }
@@ -156,7 +157,7 @@ class kontroler__uzytkownik {
         if ($czy_istnieje_uzytkownik) {
             $_SESSION['zalogowany'] = 1;
             $_SESSION['dane_poprawne'] = 1;
-
+            $this->model->zaloguj($login);    
             //sprawdzamy czy ma uprawnienia administratora
             $wynik_moderator = $this->model->czy_jest_moderatorem($login);
             if ($wynik_moderator) {

@@ -11,7 +11,7 @@ class widok__widok {
      * @var String $tytul tytuł strony
      */
 
-    private $szablon;
+    public $szablon;
     private $tytul;
 
     /**
